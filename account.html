@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tài khoản - 3T Furniture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold text-blue-600">3T Furniture</a>
+      <div id="account-btn" class="relative cursor-pointer text-gray-600 hover:text-blue-600"></div>
+    </div>
+  </nav>
+
+  <!-- Nội dung tài khoản -->
+  <main class="max-w-5xl mx-auto px-8 py-10 bg-white mt-6 shadow rounded space-y-10 flex-1">
+    <!-- Avatar + Tiêu đề -->
+    <div class="flex items-center space-x-6">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar"
+        class="w-20 h-20 rounded-full border border-gray-300" />
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">Thông tin tài khoản</h1>
+        <p class="text-base text-gray-500">Quản trị viên</p>
+      </div>
+    </div>
+
+    <!-- Form thông tin -->
+    <section class="bg-gray-50 p-8 rounded-lg shadow-inner border border-gray-200">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3">Chỉnh sửa thông tin</h2>
+      <form id="infoForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="fullName" class="block font-medium text-gray-700 mb-1">Họ tên</label>
+          <input type="text" id="fullName" required
+            class="w-full border px-5 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        </div>
+        <div>
+          <label for="email" class="block font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="email" required
+            class="w-full border px-5 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        </div>
+        <div class="md:col-span-2 text-right">
+          <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow transition font-medium">Cập nhật thông tin</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Đổi mật khẩu -->
+    <section class="bg-gray-50 p-8 rounded-lg shadow-inner border border-gray-200">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3">Đổi mật khẩu</h2>
+      <form id="changePassForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="currentPass" class="block font-medium text-gray-700 mb-1">Mật khẩu hiện tại</label>
+          <input type="password" id="currentPass" required
+            class="w-full border px-5 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div>
+          <label for="newPass" class="block font-medium text-gray-700 mb-1">Mật khẩu mới</label>
+          <input type="password" id="newPass" required
+            class="w-full border px-5 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div class="md:col-span-2 text-right">
+          <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow transition font-medium">Đổi mật khẩu</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Footer giữ nguyên -->
+  <footer class="bg-[#003b6f] text-white pt-10 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="font-semibold text-lg mb-3">THÔNG TIN LIÊN HỆ</h3>
+        <p><strong>Giám đốc:</strong> Nguyen Dinh Tien</p>
+        <p><strong>Tổng kho:</strong> Dị Nậu, Tây Phương, Thạch Thất, Hà Nội</p>
+        <p><strong>Xưởng sản xuất:</strong> Dị Nậu, Thạch Thất, Hà Nội</p>
+        <p><strong>Hotline:</strong> <span class="text-red-400">0369.696.969</span></p>
+      </div>
+      <div>
+        <h3 class="font-semibold text-lg mb-3">CHÍNH SÁCH KHÁCH HÀNG</h3>
+        <ul class="space-y-2">
+          <li>Chính sách bảo hành sản phẩm</li>
+          <li>Chính sách giao hàng</li>
+          <li>Chính sách đổi trả, hoàn tiền</li>
+          <li>Chính sách bảo mật thông tin cá nhân</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold text-lg mb-3">LIÊN HỆ VỚI CHÚNG TÔI</h3>
+        <div class="flex space-x-3 mb-4">
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/220/220236.png" class="w-6 h-6"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" class="w-6 h-6"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" class="w-6 h-6"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" class="w-6 h-6"></a>
+        </div>
+        <h4 class="font-semibold mb-2">CHẤP NHẬN THANH TOÁN</h4>
+        <div class="flex space-x-2">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" class="h-6">
+          <img src="https://www.logo.wine/a/logo/PayPal/PayPal-Logo.wine.svg" class="h-6">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" class="h-6">
+        </div>
+      </div>
+    </div>
+    <div class="text-center text-gray-300 text-sm mt-6 pb-4 px-4">
+      © 2025 Thiết kế bởi sinh viên Nguyễn Đình Tiên - Trường Cao Đẳng Công Thương Việt Nam
+    </div>
+  </footer>
+
+  <!-- Script xử lý -->
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+
+    if (!currentUser) {
+      alert('Bạn chưa đăng nhập!');
+      window.location.href = 'login.html';
+    }
+
+    const userIndex = users.findIndex(u => u.username === currentUser.username);
+    const nameInput = document.getElementById("fullName");
+    const emailInput = document.getElementById("email");
+
+    nameInput.value = currentUser.fullName || "";
+    emailInput.value = currentUser.email || "";
+
+    document.getElementById("infoForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const newName = nameInput.value.trim();
+      const newEmail = emailInput.value.trim();
+
+      users[userIndex].fullName = newName;
+      users[userIndex].email = newEmail;
+
+      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem("currentUser", JSON.stringify(users[userIndex]));
+
+      alert("Cập nhật thông tin thành công!");
+    });
+
+    document.getElementById("changePassForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const currentPass = document.getElementById("currentPass").value;
+      const newPass = document.getElementById("newPass").value;
+
+      if (users[userIndex].password === currentPass) {
+        users[userIndex].password = newPass;
+        localStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("currentUser", JSON.stringify(users[userIndex]));
+        alert("Đổi mật khẩu thành công!");
+      } else {
+        alert("Mật khẩu hiện tại không đúng!");
+      }
+    });
+
+    const accountBtn = document.getElementById("account-btn");
+    if (currentUser && accountBtn) {
+      accountBtn.innerHTML = `
+        <div class="relative group" id="account-wrapper">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+               class="w-8 h-8 rounded-full inline-block" alt="avatar" id="avatar-icon">
+          <div id="account-menu"
+               class="hidden absolute right-0 mt-2 w-48 bg-white border rounded shadow z-50 text-sm">
+            <a href="account.html" class="block px-4 py-2 hover:bg-gray-100">Thông tin tài khoản</a>
+            <a href="address.html" class="block px-4 py-2 hover:bg-gray-100">Sổ địa chỉ</a>
+            <a href="orders.html" class="block px-4 py-2 hover:bg-gray-100">Đơn hàng</a>
+            ${currentUser.role === 'admin' ? '<a href="admin/dashboard.html" class="block px-4 py-2 hover:bg-gray-100">Quản trị</a>' : ''}
+            <button onclick="logout()" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">Đăng xuất</button>
+          </div>
+        </div>
+      `;
+    }
+
+    document.addEventListener('click', function (e) {
+      const wrapper = document.getElementById('account-wrapper');
+      const menu = document.getElementById('account-menu');
+      const avatar = document.getElementById('avatar-icon');
+
+      if (avatar && avatar.contains(e.target)) {
+        menu.classList.toggle('hidden');
+      } else if (!wrapper.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+
+</html>

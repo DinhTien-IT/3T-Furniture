@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý sản phẩm - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+  <!-- Header -->
+  <div class="bg-white px-6 py-4 shadow-sm flex justify-between items-center">
+    <h1 class="text-xl font-semibold text-blue-700">🛠️ Trang quản trị - Sản phẩm</h1>
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+         alt="avatar"
+         class="w-8 h-8 rounded-full border shadow" />
+  </div>
+
+  <!-- Nội dung chính -->
+  <div class="max-w-6xl mx-auto p-6">
+
+    <!-- Dòng tiêu đề + nút về trang chủ -->
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800">➕ Thêm sản phẩm mới</h2>
+      <a href="../../index.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+        ← Về trang chủ
+      </a>
+    </div>
+
+    <!-- Form thêm sản phẩm -->
+    <form id="productForm" class="bg-white p-6 rounded-2xl shadow-lg mb-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" id="name" placeholder="Tên sản phẩm" required class="border p-3 rounded-md">
+        <input type="number" id="price" placeholder="Giá (₫)" required class="border p-3 rounded-md">
+        <input type="file" id="image" accept="image/*" class="border p-3 rounded-md md:col-span-2">
+        <textarea id="description" placeholder="Mô tả chi tiết sản phẩm" class="border p-3 rounded-md md:col-span-2"></textarea>
+      </div>
+      <button type="submit" class="mt-5 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+        Thêm sản phẩm
+      </button>
+    </form>
+
+    <!-- Danh sách sản phẩm -->
+    <h2 class="text-xl font-semibold mb-4 text-gray-800">📦 Danh sách sản phẩm</h2>
+    <div id="productList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const productForm = document.getElementById("productForm");
+    const productList = document.getElementById("productList");
+    let products = JSON.parse(localStorage.getItem("products")) || [];
+
+    productForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const price = +document.getElementById("price").value;
+      const description = document.getElementById("description").value.trim();
+      const imageFile = document.getElementById("image").files[0];
+
+      if (!name || !price || !imageFile) {
+        alert("Vui lòng nhập đầy đủ thông tin.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const newProduct = {
+          id: "sp" + Date.now(),
+          name,
+          price,
+          description,
+          image: reader.result
+        };
+        products.push(newProduct);
+        localStorage.setItem("products", JSON.stringify(products));
+        productForm.reset();
+        renderProducts();
+      };
+
+      reader.readAsDataURL(imageFile);
+    });
+
+    function renderProducts() {
+      productList.innerHTML = "";
+      if (products.length === 0) {
+        productList.innerHTML = "<p class='text-gray-600'>Chưa có sản phẩm nào.</p>";
+        return;
+      }
+
+      products.forEach((p, index) => {
+        productList.innerHTML += `
+          <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-48 object-cover rounded mb-3">
+            <h3 class="text-lg font-bold text-gray-800">${p.name}</h3>
+            <p class="text-blue-600 font-semibold mb-1">${p.price.toLocaleString()}₫</p>
+            <p class="text-gray-600 text-sm mb-4">${p.description || "Không có mô tả."}</p>
+            <button onclick="deleteProduct(${index})" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm">
+              🗑️ Xóa
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    function deleteProduct(index) {
+      if (confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
+        products.splice(index, 1);
+        localStorage.setItem("products", JSON.stringify(products));
+        renderProducts();
+      }
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>

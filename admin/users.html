@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý người dùng - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 min-h-screen">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-blue-600">Quản lý người dùng</h1>
+      <a href="../index.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">← Về trang chủ</a>
+    </div>
+
+    <table class="w-full bg-white shadow rounded overflow-hidden text-sm">
+      <thead class="bg-gray-200 text-gray-700">
+        <tr>
+          <th class="py-2 px-4 text-left">Họ tên</th>
+          <th class="py-2 px-4 text-left">Tên đăng nhập</th>
+          <th class="py-2 px-4 text-left">Mật khẩu</th>
+          <th class="py-2 px-4 text-left">Vai trò</th>
+          <th class="py-2 px-4 text-left">Địa chỉ</th>
+          <th class="py-2 px-4 text-left">SĐT</th>
+          <th class="py-2 px-4 text-left">Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="userTable" class="text-gray-800"></tbody>
+    </table>
+  </div>
+
+  <script>
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+    const userTable = document.getElementById("userTable");
+
+    if (!localStorage.getItem("addresses")) {
+      const sampleAddresses = users.map(user => ({
+        username: user.username,
+        address: "Chưa cập nhật",
+        phone: ""
+      }));
+      localStorage.setItem("addresses", JSON.stringify(sampleAddresses));
+    }
+
+    function renderUserTable() {
+      userTable.innerHTML = "";
+      const allAddresses = JSON.parse(localStorage.getItem("addresses")) || [];
+
+      users.forEach((user, index) => {
+        const addressData = allAddresses.find(addr => addr.username?.toLowerCase() === user.username?.toLowerCase());
+        const address = addressData?.address || "Chưa cập nhật";
+        const phone = addressData?.phone || "";
+
+        const isSelf = user.username === currentUser.username;
+
+        userTable.innerHTML += `
+          <tr class="border-t" id="row-${index}">
+            <td class="py-2 px-4">${user.fullName || "Không có"}</td>
+            <td class="py-2 px-4">${user.username}</td>
+            <td class="py-2 px-4">${user.password || "Ẩn"}</td>
+            <td class="py-2 px-4">${user.role}</td>
+            <td class="py-2 px-4">${address}</td>
+            <td class="py-2 px-4">${phone}</td>
+            <td class="py-2 px-4 space-x-2">
+              ${isSelf ? '<span class="text-gray-400 italic">Không thể xóa</span>' :
+                `
+                <button onclick="editUser(${index})" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Sửa</button>
+                <button onclick="deleteUser(${index})" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">Xóa</button>
+                `
+              }
+            </td>
+          </tr>`;
+      });
+    }
+
+    function deleteUser(index) {
+      const confirmDelete = confirm("Bạn có chắc muốn xóa người dùng này?");
+      if (!confirmDelete) return;
+
+      const usernameToDelete = users[index].username;
+      users.splice(index, 1);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      let allAddresses = JSON.parse(localStorage.getItem("addresses")) || [];
+      allAddresses = allAddresses.filter(addr => addr.username !== usernameToDelete);
+      localStorage.setItem("addresses", JSON.stringify(allAddresses));
+
+      renderUserTable();
+    }
+
+    function editUser(index) {
+      const user = users[index];
+      const allAddresses = JSON.parse(localStorage.getItem("addresses")) || [];
+      const addressData = allAddresses.find(addr => addr.username === user.username);
+      const currentAddress = addressData?.address || "";
+      const currentPhone = addressData?.phone || "";
+
+      const row = document.getElementById(`row-${index}`);
+      row.innerHTML = `
+        <td class="py-2 px-2"><input value="${user.fullName || ""}" id="editName" class="border px-2 py-1 rounded w-full"></td>
+        <td class="py-2 px-2">${user.username}</td>
+        <td class="py-2 px-2"><input value="${user.password}" id="editPass" class="border px-2 py-1 rounded w-full"></td>
+        <td class="py-2 px-2">
+          <select id="editRole" class="border px-2 py-1 rounded w-full">
+            <option value="user" ${user.role === 'user' ? 'selected' : ''}>user</option>
+            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
+          </select>
+        </td>
+        <td class="py-2 px-2">
+          <input value="${currentAddress}" id="editAddress" class="border px-2 py-1 rounded w-full" />
+        </td>
+        <td class="py-2 px-2">
+          <input value="${currentPhone}" id="editPhone" class="border px-2 py-1 rounded w-full" />
+        </td>
+        <td class="py-2 px-2 space-x-2">
+          <button onclick="saveUser(${index})" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Lưu</button>
+          <button onclick="renderUserTable()" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">Hủy</button>
+        </td>
+      `;
+    }
+
+    function saveUser(index) {
+      const name = document.getElementById("editName").value.trim();
+      const pass = document.getElementById("editPass").value.trim();
+      const role = document.getElementById("editRole").value;
+      const address = document.getElementById("editAddress").value.trim();
+      const phone = document.getElementById("editPhone").value.trim();
+
+      if (!name || !pass) {
+        alert("Không được để trống họ tên hoặc mật khẩu!");
+        return;
+      }
+
+      users[index].fullName = name;
+      users[index].password = pass;
+      users[index].role = role;
+      localStorage.setItem("users", JSON.stringify(users));
+
+      let allAddresses = JSON.parse(localStorage.getItem("addresses")) || [];
+      const username = users[index].username;
+      const addressIndex = allAddresses.findIndex(addr => addr.username === username);
+
+      if (addressIndex >= 0) {
+        allAddresses[addressIndex].address = address;
+        allAddresses[addressIndex].phone = phone;
+      } else {
+        allAddresses.push({ username, address, phone });
+      }
+
+      localStorage.setItem("addresses", JSON.stringify(allAddresses));
+      renderUserTable();
+    }
+
+    renderUserTable();
+  </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - 3T Furniture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+  <!-- Navbar -->
+  <nav class="bg-blue-700 text-white py-4 px-6">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <a href="../index.html" class="text-white text-2xl hover:text-yellow-300" title="Về trang chủ">3T Furniture</a>
+        <h1 class="text-xl font-bold">Bảng điều khiển - Quản trị viên</h1>
+      </div>
+      <button onclick="logout()" class="hover:underline">Đăng xuất</button>
+    </div>
+  </nav>
+
+  <!-- Thống kê đơn hàng + doanh thu -->
+  <section class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded shadow text-center">
+      <p class="text-xl font-semibold text-gray-700">Tổng đơn hàng</p>
+      <p id="total-orders" class="text-3xl font-bold text-blue-600 mt-2">0</p>
+    </div>
+    <div class="bg-white p-6 rounded shadow text-center">
+      <p class="text-xl font-semibold text-gray-700">Tổng doanh thu</p>
+      <p id="total-revenue" class="text-3xl font-bold text-green-600 mt-2">0₫</p>
+    </div>
+  </section>
+
+  <!-- Quản lý -->
+  <main class="max-w-6xl mx-auto p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded shadow text-center">
+        <h2 class="text-2xl font-bold text-blue-600">🪑</h2>
+        <p class="text-lg font-semibold mt-2">Sản phẩm</p>
+        <a href="products.html" class="text-blue-500 hover:underline">Quản lý</a>
+      </div>
+      <div class="bg-white p-6 rounded shadow text-center">
+        <h2 class="text-2xl font-bold text-blue-600">📦</h2>
+        <p class="text-lg font-semibold mt-2">Đơn hàng</p>
+        <a href="orders.html" class="text-blue-500 hover:underline">Quản lý</a>
+      </div>
+      <div class="bg-white p-6 rounded shadow text-center">
+        <h2 class="text-2xl font-bold text-blue-600">👥</h2>
+        <p class="text-lg font-semibold mt-2">Người dùng</p>
+        <a href="users.html" class="text-blue-500 hover:underline">Quản lý</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Script -->
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (!currentUser || currentUser.role !== 'admin') {
+      alert("Bạn không có quyền truy cập!");
+      window.location.href = "/index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "/index.html";
+    }
+
+    // Tính tổng đơn hàng và doanh thu (chỉ tính đơn không bị hủy)
+    document.addEventListener("DOMContentLoaded", () => {
+      const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+      let totalOrders = orders.filter(o => o.status !== "Đã hủy").length;
+      let totalRevenue = orders.reduce((sum, order) => {
+        if (order.status !== "Đã hủy") {
+          return sum + (order.total || 0);
+        }
+        return sum;
+      }, 0);
+
+      document.getElementById("total-orders").textContent = totalOrders;
+      document.getElementById("total-revenue").textContent = totalRevenue.toLocaleString("vi-VN") + "₫";
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý đơn hàng - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-blue-600">Trang quản trị - Đơn hàng</h1>
+    <div id="admin-account" class="relative"></div>
+  </nav>
+
+  <!-- Bộ lọc và thống kê -->
+  <div class="max-w-6xl mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Danh sách đơn hàng</h2>
+      <a href="../index.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">← Về trang chủ</a>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div>
+        <label for="statusFilter" class="block mb-2 font-medium">Lọc theo trạng thái:</label>
+        <select id="statusFilter" class="border px-4 py-2 rounded w-full">
+          <option value="">Tất cả</option>
+          <option value="Chờ xử lý">Chờ xử lý</option>
+          <option value="Đã nhận đơn">Đã nhận đơn</option>
+          <option value="Đã hủy">Đã hủy</option>
+        </select>
+      </div>
+      <div>
+        <label for="dateFilter" class="block text-sm font-medium text-gray-700 mb-1">Ngày đặt hàng</label>
+        <div class="relative">
+          <input type="date" id="dateFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm" />
+          <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 4h10M5 11h14M5 15h14M5 19h14"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="flex flex-col justify-end">
+        <div class="bg-white p-4 rounded shadow border text-center">
+          <p class="text-gray-500">Tổng doanh thu</p>
+          <p id="totalRevenue" class="text-xl font-bold text-green-600">0₫</p>
+        </div>
+      </div>
+      <div class="flex flex-col justify-end">
+        <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">📤 Xuất Excel</button>
+      </div>
+    </div>
+
+    <div id="orderList" class="space-y-6"></div>
+  </div>
+
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (!currentUser || currentUser.role !== 'admin') {
+      alert("Bạn không có quyền truy cập.");
+      window.location.href = "../index.html";
+    }
+
+    const adminAccount = document.getElementById("admin-account");
+    adminAccount.innerHTML = `
+      <div class="relative" id="account-menu-wrapper">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+             class="w-8 h-8 rounded-full cursor-pointer"
+             id="avatar-icon" alt="admin">
+        <div id="account-menu" class="hidden absolute right-0 mt-2 w-48 bg-white shadow border rounded z-50 text-sm">
+          <a href="../account.html" class="block px-4 py-2 hover:bg-gray-100">Thông tin tài khoản</a>
+          <button onclick="logout()" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">Đăng xuất</button>
+        </div>
+      </div>
+    `;
+    document.getElementById("avatar-icon").addEventListener("click", () => {
+      document.getElementById("account-menu").classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("account-menu-wrapper").contains(e.target)) {
+        document.getElementById("account-menu").classList.add("hidden");
+      }
+    });
+    function logout() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "../index.html";
+    }
+
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    const orderList = document.getElementById("orderList");
+    const statusFilter = document.getElementById("statusFilter");
+    const dateFilter = document.getElementById("dateFilter");
+    const totalRevenueElement = document.getElementById("totalRevenue");
+
+    function updateOrders() {
+      orderList.innerHTML = "";
+      const statusValue = statusFilter.value;
+      const dateValue = dateFilter.value;
+
+      if (orders.length === 0) {
+        orderList.innerHTML = '<p class="text-gray-500">Chưa có đơn hàng nào.</p>';
+        totalRevenueElement.textContent = '0₫';
+        return;
+      }
+
+      const filteredOrders = orders.filter(order => {
+        const matchStatus = !statusValue || (order.status || "Chờ xử lý") === statusValue;
+        const matchDate = !dateValue || (order.date && order.date.startsWith(dateValue));
+        return matchStatus && matchDate;
+      });
+
+      if (filteredOrders.length === 0) {
+        orderList.innerHTML = '<p class="text-gray-500">Không có đơn hàng phù hợp.</p>';
+        totalRevenueElement.textContent = '0₫';
+        return;
+      }
+
+      let totalRevenue = 0;
+
+      [...filteredOrders].reverse().forEach(order => {
+        const index = orders.findIndex(o => o.id === order.id);
+
+        if (order.status !== "Đã hủy") {
+          totalRevenue += order.total || 0;
+        }
+
+        let html = `<div class="bg-white rounded-lg shadow p-4 border">
+          <div class="flex justify-between items-center mb-2">
+            <p class="font-semibold text-blue-700">Mã đơn: <span class="text-black">#${order.id}</span></p>
+            <p class="text-sm text-gray-500">Ngày đặt: ${order.date}</p>
+          </div>
+          <div class="mb-2">
+            <p><strong>Người đặt:</strong> ${order.user}</p>
+            <p><strong>Số điện thoại:</strong> ${order.phone}</p>
+            <p><strong>Địa chỉ:</strong> ${order.address}</p>
+            <p><strong>Trạng thái:</strong> <span class="font-semibold text-green-600">${order.status || "Chờ xử lý"}</span></p>
+          </div>
+          <table class="w-full text-sm border border-gray-200 mb-3">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="text-left px-3 py-2 border">Sản phẩm</th>
+                <th class="text-center px-3 py-2 border">Số lượng</th>
+                <th class="text-right px-3 py-2 border">Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>`;
+        order.items.forEach(i => {
+          html += `
+            <tr class="border-t border-gray-200">
+              <td class="px-3 py-2 border">${i.name}</td>
+              <td class="text-center border">${i.quantity}</td>
+              <td class="text-right pr-3 border">${(i.quantity * i.price).toLocaleString()}₫</td>
+            </tr>`;
+        });
+        html += `</tbody></table>
+          <div class="text-right font-bold text-lg text-blue-600 mb-3">Tổng cộng: ${order.total.toLocaleString()}₫</div>
+          <div class="flex flex-wrap gap-2">`;
+
+        if ((order.status || "Chờ xử lý") !== "Đã hủy") {
+          html += `
+            <button onclick="updateStatus(${index}, 'Đã nhận đơn')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">Nhận đơn</button>
+            <button onclick="updateStatus(${index}, 'Đã hủy')" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded">Hủy đơn</button>`;
+        }
+
+        html += `</div></div>`;
+        orderList.innerHTML += html;
+      });
+
+      totalRevenueElement.textContent = totalRevenue.toLocaleString('vi-VN') + '₫';
+    }
+
+    function updateStatus(index, newStatus) {
+      orders[index].status = newStatus;
+      localStorage.setItem("orders", JSON.stringify(orders));
+      updateOrders();
+    }
+
+    function exportToExcel() {
+      const data = orders.map(order => ({
+        "Mã đơn": `#${order.id}`,
+        "Khách hàng": order.user,
+        "SĐT": order.phone,
+        "Địa chỉ": order.address,
+        "Ngày đặt": order.date,
+        "Trạng thái": order.status,
+        "Tổng tiền": order.total
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "DonHang");
+      XLSX.writeFile(workbook, "DanhSachDonHang.xlsx");
+    }
+
+    statusFilter.addEventListener("change", updateOrders);
+    dateFilter.addEventListener("change", updateOrders);
+    updateOrders();
+  </script>
+</body>
+</html>
