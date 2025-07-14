@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng nhập - 3T Furniture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Đăng nhập</h2>
+    <form id="loginForm" class="space-y-4">
+      <input type="text" id="username" placeholder="Tên đăng nhập" required class="w-full border px-3 py-2 rounded">
+      <input type="password" id="password" placeholder="Mật khẩu" required class="w-full border px-3 py-2 rounded">
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Đăng nhập</button>
+    </form>
+
+    <p class="text-center mt-4">
+      Chưa có tài khoản? <a href="register.html" class="text-blue-600 hover:underline">Đăng ký</a>
+    </p>
+
+    <p id="message" class="text-red-500 mt-2 text-center"></p>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
+
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Tìm tài khoản trùng khớp
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (!user) {
+        message.textContent = "Tên đăng nhập hoặc mật khẩu không đúng!";
+        return;
+      }
+
+      // Lưu thông tin người dùng đã đăng nhập
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      message.style.color = "green";
+      message.textContent = "Đăng nhập thành công! Đang chuyển hướng...";
+      setTimeout(() => window.location.href = "index.html", 1500);
+    });
+  </script>
+</body>
+</html>
